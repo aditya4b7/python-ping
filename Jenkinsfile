@@ -14,8 +14,8 @@ pipeline {
 			  		  
 			  sh '''
 			      
-				  rsync -avh ${WORKSPACE}/PC1 PC1:/home/ --delete-before
-				  ssh -t PC1  python ping.py
+				  rsync -avh ${WORKSPACE}/pc1 pi@192.168.3.2:pc1 --delete-before
+				  ssh -t pi@192.168.3.2  python pc1/ping.py
 		  					
 				'''
 								    
