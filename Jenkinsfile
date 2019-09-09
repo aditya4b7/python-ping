@@ -14,14 +14,38 @@ pipeline {
 			  		  
 			  sh '''
 			      
-				  rsync -avh ${WORKSPACE}/pc1 pi@192.168.3.2:pc1 --delete-before
-				  ssh -t pi@192.168.3.2  cd pc1; python ping.py
+				  scp -r ${WORKSPACE}/pc1/* pi@192.168.3.2: 			  		 ssh -t pi@192.168.3.2  python ping.py
 		  					
 				'''
 								    
 		}
     }
 	
+      stage('PC2-to-PC1'){
+
+
+                steps {
+
+
+                          sh '''
+
+                                  scp -r ${WORKSPACE}/pc2/* pi@192.168.3.3:                                      ssh -t pi@192.168.3.3  python ping.py
+
+                                '''
+
+                }
+    }
+
+     stage('Jen-PC1-PC2'){
+
+
+                steps {
+
+
+                          sh 'python ping.py'
+
+                }
+    }
  
   }
 }
