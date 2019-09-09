@@ -14,7 +14,8 @@ pipeline {
 			  		  
 			  sh '''
 			      
-				  scp -r ${WORKSPACE}/pc1/* pi@192.168.3.2: 			  		 ssh -t pi@192.168.3.2  python ping.py
+				  scp -r ${WORKSPACE}/pc1/* pi@192.168.3.2:
+				  ssh -t pi@192.168.3.2  python ping.py
 		  					
 				'''
 								    
@@ -29,7 +30,8 @@ pipeline {
 
                           sh '''
 
-                                  scp -r ${WORKSPACE}/pc2/* pi@192.168.3.3:                                      ssh -t pi@192.168.3.3  python ping.py
+                                  scp -r ${WORKSPACE}/pc2/* pi@192.168.3.3:
+				  ssh -t pi@192.168.3.3  python ping.py
 
                                 '''
 
