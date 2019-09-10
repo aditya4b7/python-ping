@@ -1,0 +1,42 @@
+#!/usr/bin/groovy
+
+def performsfsDeployment(String share) {
+    stage("${share}") {
+                sh "scp -r p* intershop1@${share}:"
+                sh "ssh -t intershop1@${share} python ping.py 2>&1  ${share}-pingtest.txt"
+                sh "scp -r intershop1@${share}:${share}-pingtest.txt ."
+        }
+
+}
+
+
+node('master') {
+
+        stage('Checkout') {
+                checkout scm
+        }
+
+        def rootDir = pwd()
+        println "rootDir :: ${rootDir}"
+
+        // Read required jenkins workflow configuration values.
+        def config = readJSON file:'pcs.json'
+
+
+                stage('ping-test') {
+                                                def sfs = [:]
+                                                for (share in config.server) {
+                                                        performsfsDeployment(share)
+
+                                                }
+
+                        }
+
+                   stage('Archive') {
+                                archiveArtifacts artifacts: '*-pingtest.txt', onlyIfSuccessful: true
+                        }
+
+
+
+}
+
