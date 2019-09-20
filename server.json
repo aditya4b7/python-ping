@@ -1,0 +1,15 @@
+{
+        "General": {
+                "TestType": "PC-1 / PC-2 / ALL"
+        },
+        "PC-1": {
+                "PiIP": "172.31.83.0",
+                "UserName": "ec2-user",
+                "Password": "abc123"
+        },
+        "PC-2": {
+                "PiIP": "172.31.83.0",
+                "UserName": "ec2-user",
+                "Password": "abc123"
+        }
+}
