@@ -5,7 +5,7 @@ import os
 import subprocess
 
 
-def read_json_to_fetch_user_pwd(json_file):
+def read_json_to_fetch_user_pwd(json_file,input_type):
     ping_result = "\n\n"
     dct = {}
     with open(json_file) as f:
@@ -16,39 +16,68 @@ def read_json_to_fetch_user_pwd(json_file):
 
         if val.strip() in data:
             host = (data[val.strip()]['PiIP'])
-
-            res = subprocess.call(["ping", "-c 5", host])
-            if res == 0:
-                ping_result = ping_result + "ping to " + host + " OK" + " \n"
-            elif res == 2:
-                ping_result = ping_result + "no response from " + host + " \n"
+            print(input_type,host)
+            if host == input_type:
+                continue
             else:
-                ping_result = ping_result + "ping to " + host + " failed!" + " \n"
+                
+                res = subprocess.call(["ping", "-c 5", host])
+                if res == 0:
+                    ping_result = ping_result + "ping to " + host + " OK" + " \n"
+                    print (ping_result)
+                elif res == 2:
+                    ping_result = ping_result + "no response from " + host + " \n"
+                    print (ping_result)
+                else:
+                    ping_result = ping_result + "ping to " + host + " failed!" + " \n"
+                    print (ping_result)
 
-te = open("ping-result.log",'a')
+
+
+# class Unbuffered:
+
+#    def __init__(self, stream):
+
+#        self.stream = stream
+
+#    def write(self):
+
+# #       self.stream.write(data)
+# #       self.stream.flush()
+#        te = open("ping-result.log",'a')
+#        te.write(self.stream)    # Write the data of stdout here to a text file as well
+#        te.close()
+
+
+       
+
+#        print (ping_result)
+
+
 
 class Unbuffered:
 
-   def __init__(self, stream):
 
-       self.stream = stream
 
-   def write(self, data):
+    def __init__(self, stream):
+
+        self.stream = stream
+
+    def write(self, data):
 
        self.stream.write(data)
-       self.stream.flush()
-       te.write(data)    # Write the data of stdout here to a text file as well
+#       self.stream.flush()
+       te = open("ping-result.log",'a')
+       te.write(data)
+       te.write('\n')    # Write the data of stdout here to a text file as well
+       te.close()
 
 
+sys.stdout=Unbuffered(sys.stdout)
 
-       sys.stdout=Unbuffered(sys.stdout)
-
-       print (ping_result)
-
-#      else:
-#       print ("key not found"),val
-#    return dct
-
+#print (ping_result)
+   
+    
 
 if __name__ == '__main__':
   try:
@@ -60,5 +89,4 @@ if __name__ == '__main__':
   except:
       input_type = 'All'
 
-
-  dct = read_json_to_fetch_user_pwd(json_file)
+dct = read_json_to_fetch_user_pwd(json_file,input_type)

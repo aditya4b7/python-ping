@@ -14,7 +14,7 @@ def read_json_to_fetch_user_pwd(json_file):
     for val in input_list:
 
         if val.strip() in data:
-#            print(data[val.strip()]['PiIP'])
+            print(data[val.strip()]['PiIP'])
 #            print(data[val.strip()]['UserName'])
 #            print(data[val.strip()]['Password'])
             host,port = (data[val.strip()]['PiIP']),22
@@ -30,14 +30,14 @@ def read_json_to_fetch_user_pwd(json_file):
             destfile1 = 'server.json'
             sftp.put(file1,destfile1)
 
-            file2 = 'ping.py'
-            destfile2 = 'ping.py'
+            file2 = 'icmp.py'
+            destfile2 = 'icmp.py'
             sftp.put(file2,destfile2)
 
             s = paramiko.SSHClient()
             s.load_system_host_keys()
             s.connect(host, port, username, password)
-            command = 'python ping.py'
+            command = 'python3 icmp.py server.json {0}'.format(host,)
             (stdin, stdout, stderr) = s.exec_command(command)
             for line in stdout.readlines():
               print(line)
