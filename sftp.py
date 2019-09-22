@@ -37,7 +37,7 @@ def read_json_to_fetch_user_pwd(json_file):
             s = paramiko.SSHClient()
             s.load_system_host_keys()
             s.connect(host, port, username, password)
-            command = 'echo what is your name'
+            command = 'python ping.py'
             (stdin, stdout, stderr) = s.exec_command(command)
             for line in stdout.readlines():
               print(line)
