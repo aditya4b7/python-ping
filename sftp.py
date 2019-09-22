@@ -43,6 +43,10 @@ def read_json_to_fetch_user_pwd(json_file):
               print(line)
             s.close()
 
+            file1 = 'ping-result.log'
+            destfile1 = '{0}-ping-result.log'.format(host,)
+            sftp.get(file1,destfile1)
+
             if sftp: sftp.close()
             if transport: transport.close()
 
