@@ -1,0 +1,55 @@
+#!/usr/bin/groovy
+
+def performsfsDeployment(String share) {
+    stage("${share}") {
+//                sh "scp -r p* pi@${share}:"
+//                sh "ssh pi@${share} python ping.py "
+//                sh "scp -r pi@${share}:ping-result.log ."
+//                sh "mv ping-result.log ${share}-ping-result.log"
+                sh "python3 sftp.py server.json ${share}"
+        }
+
+}
+
+
+node('master') {
+
+        stage('Checkout') {
+                checkout scm
+        }
+
+        def rootDir = pwd()
+        println "rootDir :: ${rootDir}"
+
+        // Read required jenkins workflow configuration values.
+        def config = readJSON file:'server.json'
+        def input_list = config.General.TestType.split('/')
+//        def value = config.input_list.PiIP
+                stage('ping-test') {
+                                       parallel {
+					  stage('ping'){ 
+					        def sfs = [:]
+                                                for (share in input_list) {
+                                                        performsfsDeployment(share)
+
+
+                                                }
+}
+					                                          stage('ping2'){ 
+                                              def sfs = [:]                                                for (share in input_list) {
+                                                        performsfsDeployment(share)
+
+
+                                                }
+				}
+                        }
+  }
+
+                   stage('Archive') {
+                                archiveArtifacts artifacts: '*-ping-result.log', onlyIfSuccessful: true
+                        }
+
+
+
+}
+
