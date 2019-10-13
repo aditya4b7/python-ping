@@ -1,55 +1,78 @@
-#!/usr/bin/groovy
-
-def performsfsDeployment(String share) {
-    stage("${share}") {
-//                sh "scp -r p* pi@${share}:"
-//                sh "ssh pi@${share} python ping.py "
-//                sh "scp -r pi@${share}:ping-result.log ."
-//                sh "mv ping-result.log ${share}-ping-result.log"
-                sh "python3 sftp.py server.json ${share}"
-        }
-
-}
-
+// main script block
+// could use eg. params.parallel build parameter to choose parallel/serial
+def runParallel = true
+def buildStages
 
 node('master') {
-
         stage('Checkout') {
                 checkout scm
         }
+stage('Serial'){
+   def config = readJSON file:'server.json'
+   def input_list = config.General.TestType.split('/')
 
-        def rootDir = pwd()
-        println "rootDir :: ${rootDir}"
+    for (name in input_list ) {
+      def n = "${name}"
+      serialbuild(n)
+    }
 
-        // Read required jenkins workflow configuration values.
-        def config = readJSON file:'server.json'
-        def input_list = config.General.TestType.split('/')
-//        def value = config.input_list.PiIP
-                stage('ping-test') {
-                                       parallel {
-					  stage('ping'){ 
-					        def sfs = [:]
-                                                for (share in input_list) {
-                                                        performsfsDeployment(share)
-
-
-                                                }
 }
-					                                          stage('ping2'){ 
-                                              def sfs = [:]                                                for (share in input_list) {
-                                                        performsfsDeployment(share)
 
 
-                                                }
-				}
-                        }
+
+  stage('Parallel') {
+    // Set up List<Map<String,Closure>> describing the builds
+    buildStages = prepareBuildStages()
+    println("Initialised pipeline.")
   }
 
-                   stage('Archive') {
-                                archiveArtifacts artifacts: '*-ping-result.log', onlyIfSuccessful: true
-                        }
 
+  for (builds in buildStages) {
+    if (runParallel) {
+      parallel(builds)
+    } else {
+      // run serially (nb. Map is unordered! )
+      for (build in builds.values()) {
+        build.call()
+      }
+    }
+  }
 
+  stage('Finish') {
+      println('Build complete.')
+  }
+}
 
+// Create List of build stages to suit
+def prepareBuildStages() {
+   def config = readJSON file:'server.json'
+   def input_list = config.General.TestType.split('/')
+
+  def buildList = []
+  for (i=1; i<5; i++) {
+    def buildStages = [:]
+    for (name in input_list ) {
+      def n = "${name}"
+      buildStages.put(n, prepareOneBuildStage(n))
+    }
+    buildList.add(buildStages)
+  }
+  return buildList
+}
+
+def prepareOneBuildStage(String name) {
+  return {
+    stage("Build stage:${name}") {
+      println("Building ${name}")
+      sh(script:'sleep 5', returnStatus:true)
+    }
+  }
+}
+
+def serialbuild(String name) {
+    stage("Build stage:${name}") {
+      println("Building ${name}")
+      sh(script:'sleep 5')
+    }
 }
 
