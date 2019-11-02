@@ -72,7 +72,8 @@ def prepareOneBuildStage(String name) {
 def serialbuild(String name) {
     stage("Build stage:${name}") {
       println("Building ${name}")
-      sh(script:'sleep 5')
+      sh(script:'sh /opt/apache-tomcat-8.5.47/bin/startup.sh')
+      sh(script:'sh /opt/apache-tomcat-8.5.47/bin/shutdown.sh')
     }
 }
 
